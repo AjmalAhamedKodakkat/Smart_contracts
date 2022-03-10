@@ -4,6 +4,7 @@
 pragma solidity >=0.6.0<0.9.0;
 
 
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @dev Interface of the ERC165 standard, as defined in the
@@ -1251,5 +1252,38 @@ abstract contract ERC721Burnable is Context, ERC721 {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721Burnable: caller is not owner nor approved");
         _burn(tokenId);
+    }
+}
+
+contract MyToken is ERC721, ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+
+    Counters.Counter private _tokenIdCounter;
+
+    event tokenIdValue (uint tokenIdValue);
+
+    constructor() ERC721("Metalink-NFT-3", "MNFT3") {}
+
+    function safeMint(address to, string memory uri) public  {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
+        emit tokenIdValue(tokenId);
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
     }
 }
